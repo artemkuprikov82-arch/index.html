@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диспетчерская 112 — City RP</title>
+<style>
+  :root {
+    --bg:#0d1117; --panel:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e;
+    --red:#da3633; --red-h:#f85149; --green:#238636; --green-h:#2ea043;
+    --blue:#58a6ff; --orange:#f0883e; --ok:#3fb950;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', system-ui, sans-serif; }
+  body { min-height:100vh; background:var(--bg); color:var(--text); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:28px; width:100%; max-width:560px; }
+  .logo { color:var(--red-h); font-size:44px; font-weight:800; letter-spacing:8px; text-align:center; }
+  .sub { color:var(--muted); text-align:center; margin:4px 0 22px; font-size:14px; }
+  .screen { margin-top:8px; }
+  button { padding:12px 16px; margin:5px 4px 5px 0; border:none; border-radius:10px; font-size:15px; cursor:pointer; font-weight:600; }
+  .btn-red   { background:var(--red);   color:#fff; } .btn-red:hover   { background:var(--red-h); }
+  .btn-green { background:var(--green); color:#fff; } .btn-green:hover { background:var(--green-h); }
+  .btn-grey  { background:var(--border); color:var(--text); }
+  input[type="text"] { width:100%; padding:13px; margin:8px 0; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:16px; text-align:center; }
+  .line-card { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px; margin:10px 0; }
+  .line-name { font-weight:700; }
+  .line-num  { color:var(--blue); user-select:all; cursor:pointer; margin:4px 0; font-size:15px; }
+  .line-state { font-size:13px; color:var(--muted); margin:6px 0; }
+  .line-state.active { color:var(--ok); font-weight:700; }
+  .line-state.ring   { color:var(--orange); font-weight:700; }
+  .status { min-height:22px; color:var(--muted); margin:10px 0; font-size:14px; }
+  .status.active { color:var(--ok); font-weight:600; }
+  .hidden { display:none; }
+  .log { margin-top:14px; font-size:13px; color:var(--muted); max-height:150px; overflow-y:auto; border-top:1px solid var(--border); padding-top:8px; }
+  .log div { padding:3px 0; border-bottom:1px solid #21262d; }
+  .err { color:var(--red-h); font-size:13px; margin-top:10px; }
+  label.chk { font-size:14px; color:var(--muted); display:block; margin:10px 0; }
+  h3 { margin:18px 0 6px; font-size:15px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">112</div>
+  <p class="sub">Единая служба экстренных вызовов — игровая диспетчерская</p>
+
+  <div class="screen" id="screen-role">
+    <button class="btn-red"   id="btn-role-op">Я оператор — принимать звонки</button>
+    <button class="btn-green" id="btn-role-call">Я вызываю службы</button>
+  </div>
+
+  <div class="screen hidden" id="screen-op">
+    <p>Код диспетчерской (латиницей, одинаковый у всех):</p>
+    <input type="text" id="op-code" value="city-rp" maxlength="24">
+    <label class="chk"><input type="checkbox" id="op-auto"> Автоответ: сразу на удержание с музыкой</label>
+    <button class="btn-red" id="btn-open">Открыть диспетчерскую</button>
+    <div class="status" id="op-status"></div>
+    <div id="lines"></div>
+    <h3>Журнал вызовов</h3>
+    <div class="log" id="op-log"></div>
+    <button class="btn-grey" id="btn-back-op" style="margin-top:12px">← Назад</button>
+  </div>
+
+  <div class="screen hidden" id="screen-call">
+    <p>Код диспетчерской:</p>
+    <input type="text" id="call-code" value="city-rp" maxlength="24">
+    <div>
+      <button class="btn-red"   id="btn-call-112">Вызвать 112</button>
+      <button class="btn-green" id="btn-call-103">Вызвать 103 — скорая</button>
+      <button class="btn-grey"  id="btn-call-102">Вызвать 102 — полиция</button>
+    </div>
+    <div class="status" id="call-status"></div>
+    <button class="btn-grey hidden" id="btn-end">Завершить вызов</button>
+    <button class="btn-grey" id="btn-back-call">← Назад</button>
+  </div>
+
+  <div class="err" id="err"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ================= НАСТРОЙКИ =================
+   Номера линий: "<служба>-<код>", например 112-city-rp.
+   Код должен совпадать у оператора и у вызывающих. */
+const SERVICES = { "112": "Единая служба 112", "103": "Скорая помощь", "102": "Полиция" };
+
+/* Настройки сигнального сервера PeerJS.
+   Публичный облачный сервер: host 0.peerjs.com, порт 443, secure.
+   Если заведёте свой сервер — замените host и порт здесь. */
+const PEER_OPTIONS = {
+  host: "0.peerjs.com",
+  port: 443,
+  path: "/",
+  secure: true,
+  debug: 1,
+  config: {
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:global.stun.twilio.com:3478" }
+    ]
+  }
+};
+
+/* ================= СОСТОЯНИЕ ================= */
+let lines = {};          // линии оператора: {peer, call}
+let micStream = null;
+let callerCall = null, callerPeer = null;
+let audioCtx = null, ringTimer = null;
+
+const $ = id => document.getElementById(id);
+const showErr = m => { $("err").textContent = "Ошибка: " + m; console.error("DISPATCHER:", m); };
+window.addEventListener("error", e => showErr(e.message));
+
+/* ================= ЗАГРУЗКА БИБЛИОТЕКИ ================= */
+function loadPeerLib(ok, fail) {
+  if (window.Peer) return ok();
+  const cdns = [
+    "https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js",
+    "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"
+  ];
+  let i = 0;
+  (function next() {
+    if (i >= cdns.length) return fail();
+    const s = document.createElement("script");
+    s.src = cdns[i++];
+    s.onload = () => (window.Peer ? ok() : next());
+    s.onerror = next;
+    document.head.appendChild(s);
+  })();
+}
+
+/* ================= ЗВУКИ ================= */
+function ensureCtx() {
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+function beep(freq, at, dur, vol) {
+  const ctx = ensureCtx();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = "sine"; o.frequency.value = freq; g.gain.value = vol;
+  o.connect(g); g.connect(ctx.destination);
+  o.start(at); o.stop(at + dur);
+}
+function startRingback() {           // гудки ожидания: тон 1 с, пауза 4 с
+  stopSound();
+  ringTimer = setInterval(() => beep(425, ensureCtx().currentTime, 1, 0.1), 5000);
+  beep(425, ensureCtx().currentTime, 1, 0.1);
+}
+function startIncomingRing() {       // двойной тон у оператора
+  stopSound();
+  const burst = () => { const t = ensureCtx().currentTime; beep(700, t, 0.3, 0.12); beep(700, t + 0.4, 0.3, 0.12); };
+  ringTimer = setInterval(burst, 2500); burst();
+}
+function stopSound() { if (ringTimer) { clearInterval(ringTimer); ringTimer = null; } }
+function makeHoldStream() {          // мелодия удержания
+  const ctx = ensureCtx();
+  const dest = ctx.createMediaStreamDestination();
+  const g = ctx.createGain(); g.gain.value = 0.07; g.connect(dest);
+  const osc = ctx.createOscillator(); osc.type = "sine"; osc.connect(g); osc.start();
+  const notes = [392, 523, 440, 523]; let i = 0;
+  setInterval(() => { osc.frequency.value = notes[i++ % notes.length]; }, 500);
+  return dest.stream;
+}
+function playRemote(stream) {
+  const a = document.createElement("audio");
+  a.srcObject = stream; a.autoplay = true;
+  document.body.appendChild(a);
+  return a;
+}
+
+/* ================= ОБЩЕЕ ================= */
+const safeId = s => (s || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+async function getMic() {
+  if (!micStream) micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  return micStream;
+}
+
+/* ================= ОПЕРАТОР ================= */
+function setState(num, cls, text) {
+  const el = $("state-" + num);
+  if (el) { el.className = "line-state " + (cls === "free" ? "" : cls); el.textContent = text; }
+}
+function showCtrl(num, buttons) {
+  const box = $("ctrl-" + num);
+  if (!box) return;
+  box.innerHTML = "";
+  buttons.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = b.cls; btn.textContent = b.text;
+    btn.addEventListener("click", b.fn);
+    box.appendChild(btn);
+  });
+}
+function addLog(num, text) {
+  const d = document.createElement("div");
+  d.textContent = new Date().toLocaleTimeString("ru-RU") + " — " + SERVICES[num] + ": " + text;
+  $("op-log").prepend(d);
+}
+function closeLine(num, text) {
+  stopSound();
+  if (lines[num]) lines[num].call = null;
+  setState(num, "free", text);
+  showCtrl(num, []);
+}
+function rejectCall(num) {
+  if (lines[num] && lines[num].call) lines[num].call.close();
+  addLog(num, "отклонён оператором");
+  closeLine(num, "свободна");
+}
+async function answerMic(num) {
+  stopSound(); showCtrl(num, []);
+  try {
+    const stream = await getMic();
+    lines[num].call.answer(stream);
+    setState(num, "active", "СОЕДИНЕНИЕ УСТАНОВЛЕНО");
+    addLog(num, "принят (микрофон)");
+    showCtrl(num, [{ cls: "btn-grey", text: "Завершить вызов", fn: () => rejectCall(num) }]);
+    lines[num].call.on("close", () => closeLine(num, "вызов завершён"));
+  } catch (e) { setState(num, "free", "нет доступа к микрофону"); }
+}
+function answerHold(num) {
+  stopSound();
+  const call = lines[num].call;
+  call.answer(makeHoldStream());
+  setState(num, "ring", "НА УДЕРЖАНИИ (музыка)");
+  addLog(num, "поставлен на удержание");
+  showCtrl(num, [
+    { cls: "btn-green", text: "Принять вызов", fn: () => acceptHold(num) },
+    { cls: "btn-grey",  text: "Завершить",     fn: () => rejectCall(num) }
+  ]);
+  call.on("close", () => closeLine(num, "вызов завершён"));
+}
+async function acceptHold(num) {
+  try {
+    const stream = await getMic();
+    const sender = lines[num].call.peerConnection.getSenders()
+      .find(s => s.track && s.track.kind === "audio");
+    if (sender) await sender.replaceTrack(stream.getAudioTracks()[0]);
+    setState(num, "active", "СОЕДИНЕНИЕ УСТАНОВЛЕНО");
+    addLog(num, "принят с удержания");
+    showCtrl(num, [{ cls: "btn-grey", text: "Завершить вызов", fn: () => rejectCall(num) }]);
+  } catch (e) { setState(num, "free", "нет доступа к микрофону"); }
+}
+
+function createLinePeer(num, attempt) {
+  const id = num + "-" + safeId($("op-code").value);
+  const peer = new Peer(id, PEER_OPTIONS);
+  lines[num].peer = peer;
+
+  peer.on("open", () => setState(num, "free", "свободна — номер активен"));
+  peer.on("error", e => {
+    console.error("PeerJS:", e.type, e);
+    if (e.type === "unavailable-id") {
+      setState(num, "free", "номер занят — смените код");
+    } else if (e.type === "network" && attempt < 3) {
+      setState(num, "free", "потеря связи — переподключение " + (attempt + 1) + "/3…");
+      setTimeout(() => { try { peer.destroy(); } catch (_) {} createLinePeer(num, attempt + 1); }, 3000);
+    } else {
+      setState(num, "free", "ошибка: " + e.type);
+    }
+  });
+  peer.on("disconnected", () => {
+    setState(num, "free", "связь с сервером потеряна — переподключение…");
+    try { peer.reconnect(); } catch (_) {}
+  });
+  peer.on("call", call => {
+    if (lines[num].call) { call.close(); addLog(num, "пропущенный (линия занята)"); return; }
+    lines[num].call = call;
+    addLog(num, "входящий вызов");
+    if ($("op-auto").checked) answerHold(num);
+    else {
+      setState(num, "ring", "ВХОДЯЩИЙ ВЫЗОВ");
+      startIncomingRing();
+      showCtrl(num, [
+        { cls: "btn-green", text: "Ответить",  fn: () => answerMic(num) },
+        { cls: "btn-grey",  text: "Отклонить", fn: () => rejectCall(num) }
+      ]);
+    }
+  });
+}
+
+function openLines() {
+  const code = safeId($("op-code").value);
+  if (!code) { $("op-status").textContent = "Введите код диспетчерской"; return; }
+  $("lines").innerHTML = "";
+  lines = {};
+  ["112", "103", "102"].forEach(num => {
+    const id = num + "-" + code;
+    const card = document.createElement("div");
+    card.className = "line-card";
+    card.innerHTML =
+      '<div class="line-name">' + SERVICES[num] + '</div>' +
+      '<div class="line-num" title="нажмите — скопируется">' + id + '</div>' +
+      '<div class="line-state" id="state-' + num + '">подключение…</div>' +
+      '<div id="ctrl-' + num + '"></div>';
+    card.querySelector(".line-num").addEventListener("click",
+      () => navigator.clipboard && navigator.clipboard.writeText(id));
+    $("lines").appendChild(card);
+    lines[num] = { peer: null, call: null };
+    createLinePeer(num, 0);
+  });
+  $("op-status").textContent = "Диспетчерская открыта. Держите вкладку открытой.";
+}
+
+/* ================= ВЫЗЫВАЮЩИЙ ================= */
+async function makeCall(num) {
+  const code = safeId($("call-code").value);
+  const st = $("call-status");
+  if (!code) { st.textContent = "Введите код диспетчерской"; return; }
+  if (callerCall) { callerCall.close(); callerCall = null; }
+  if (callerPeer) { try { callerPeer.destroy(); } catch (_) {} }
+  try {
+    const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const peer = new Peer(PEER_OPTIONS);
+    callerPeer = peer;
+    peer.on("open", () => {
+      st.textContent = "Вызов " + SERVICES[num] + "…";
+      st.classList.remove("active");
+      startRingback();
+      callerCall = peer.call(num + "-" + code, mic);
+      callerCall.on("stream", remote => {
+        stopSound();
+        st.textContent = SERVICES[num] + ": на линии";
+        st.classList.add("active");
+        $("btn-end").classList.remove("hidden");
+        callerCall._audio = playRemote(remote);
+      });
+      callerCall.on("close", () => {
+        stopSound();
+        st.textContent = "Диспетчер завершил вызов";
+        st.classList.remove("active");
+        $("btn-end").classList.add("hidden");
+        if (callerCall && callerCall._audio) callerCall._audio.remove();
+        callerCall = null;
+      });
+      callerCall.on("error", e => { stopSound(); st.textContent = "Ошибка вызова: " + (e.type || e.message); });
+    });
+    peer.on("error", e => {
+      console.error("Caller:", e.type, e);
+      stopSound();
+      st.textContent = e.type === "peer-unavailable"
+        ? "Диспетчерская не найдена — проверьте код или дождитесь, когда оператор откроет линию"
+        : "Ошибка соединения: " + e.type;
+    });
+  } catch (e) { st.textContent = "Нет доступа к микрофону"; }
+}
+function endCall() {
+  stopSound();
+  if (callerCall) { callerCall.close(); callerCall = null; }
+  $("call-status").textContent = "Вызов завершён";
+  $("call-status").classList.remove("active");
+  $("btn-end").classList.add("hidden");
+}
+
+/* ================= ЭКРАНЫ И КНОПКИ ================= */
+function showScreen(id) {
+  ["screen-role", "screen-op", "screen-call"].forEach(s => $(s).classList.add("hidden"));
+  $(id).classList.remove("hidden");
+}
+document.addEventListener("DOMContentLoaded", () => {
+  $("btn-role-op").addEventListener("click", () => showScreen("screen-op"));
+  $("btn-role-call").addEventListener("click", () => showScreen("screen-call"));
+  $("btn-back-op").addEventListener("click", () => showScreen("screen-role"));
+  $("btn-back-call").addEventListener("click", () => showScreen("screen-role"));
+  $("btn-open").addEventListener("click", () =>
+    loadPeerLib(openLines, () => showErr("не удалось загрузить библиотеку связи — проверьте интернет")));
+  ["112", "103", "102"].forEach(num =>
+    $("btn-call-" + num).addEventListener("click", () =>
+      loadPeerLib(() => makeCall(num), () => showErr("не удалось загрузить библиотеку связи — проверьте интернет"))));
+  $("btn-end").addEventListener("click", endCall);
+});
+</script>
+</body>
+</html>
