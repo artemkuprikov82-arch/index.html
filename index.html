@@ -2,915 +2,285 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Касса — Рабочее место кассира</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Единый номер 112</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-*{box-sizing:border-box}
-body{font-family:Arial,sans-serif;margin:0;background:#0f172a;color:#fff}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#0b1120;border-bottom:2px solid #eab308;gap:12px;flex-wrap:wrap}
-.topbar .t{font-size:14px;color:#cbd5e1}
-.btn{background:#eab308;color:#000;border:none;padding:10px 14px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px}
-.btn:hover{opacity:.9}
-.btn-b{background:#3b82f6;color:#fff}
-.btn-g{background:#334155;color:#fff}
-.btn-r{background:#7f1d1d;color:#fff}
-.btn-ok{background:#16a34a;color:#fff}
-.btn-v{background:#7c3aed;color:#fff}
-.wrap{display:flex;gap:14px;padding:14px;max-width:1280px;margin:0 auto}
-.col{flex:1;min-width:0}
-.card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:14px}
-h3{color:#eab308;margin-top:0}
-.small{font-size:12px;color:#94a3b8}
-input,select{width:100%;background:#0f172a;border:1px solid #475569;color:#fff;padding:10px;border-radius:6px;font-size:15px;margin:5px 0 10px}
-input:focus,select:focus{outline:none;border-color:#eab308}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-.pitem{background:#0f172a;border:1px solid #475569;border-radius:6px;padding:8px;cursor:pointer;text-align:center;position:relative}
-.pitem:hover{border-color:#eab308}
-.pitem .nm{font-size:12px;min-height:30px}
-.pitem .pr{color:#eab308;font-weight:bold;font-size:14px;margin-top:4px}
-.pitem .kg{position:absolute;top:4px;right:6px;font-size:10px;color:#7c3aed;background:rgba(124,58,237,.15);border-radius:4px;padding:1px 4px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{border:1px solid #334155;padding:6px;text-align:left}
-th{background:#0f172a;color:#eab308}
-td button{background:#334155;border:none;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;margin:0 1px}
-td button:hover{background:#475569}
-.total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:20px}
-.total b{color:#eab308;font-size:26px}
-.disc{color:#22c55e;font-size:14px}
-.payrow{display:flex;gap:8px;margin-top:12px}
-.payrow .btn{flex:1}
-.fnrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
-.fnrow .btn{font-size:12px;padding:8px 4px}
-.fnrow .btn span{display:block;font-size:10px;color:rgba(255,255,255,.55);font-weight:normal}
-.change{margin-top:10px;font-size:15px}
-#loginBox{max-width:360px;margin:40px auto;padding:22px;background:#1e293b;border-top:4px solid #eab308;border-radius:8px;text-align:center}
-#adminBox{max-width:360px;margin:40px auto;padding:22px;background:#1e293b;border-top:4px solid #7c3aed;border-radius:8px;text-align:center}
-.muted{color:#94a3b8;font-size:13px}
-#modalBg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10}
-#modal{background:#1e293b;border:1px solid #eab308;border-radius:10px;padding:20px;width:460px;max-height:85vh;overflow:auto}
-#receiptOut{width:100%;background:#0f172a;color:#fff;border:1px solid #475569;border-radius:6px;padding:10px;font-family:monospace;font-size:13px;height:280px}
-.shiftline{font-size:13px;color:#cbd5e1}
-.keysHint{font-size:11px;color:#64748b;margin-top:8px;text-align:center}
-.rowbtns{display:flex;gap:6px}
-.rowbtns>div{flex:1}
-.roleBtns{display:flex;gap:8px;margin-top:12px}
-.roleBtns .btn{flex:1}
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
+  body { min-height:100vh; background:#0d1117; color:#e6edf3; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .card { background:#161b22; border:1px solid #30363d; border-radius:16px; padding:32px; width:100%; max-width:560px; }
+  h1 { color:#ff4d4d; font-size:48px; letter-spacing:6px; margin-bottom:4px; }
+  .sub { color:#8b949e; margin-bottom:22px; }
+  button { padding:12px 16px; margin:6px 4px 6px 0; border:none; border-radius:10px; font-size:15px; cursor:pointer; font-weight:600; }
+  .btn-red { background:#da3633; color:#fff; }
+  .btn-red:hover { background:#f85149; }
+  .btn-green { background:#238636; color:#fff; }
+  .btn-green:hover { background:#2ea043; }
+  .btn-grey { background:#30363d; color:#e6edf3; }
+  input { width:100%; padding:13px; margin:8px 0; border-radius:10px; border:1px solid #30363d; background:#0d1117; color:#e6edf3; font-size:16px; text-align:center; }
+  .number-box { background:#0d1117; border:1px dashed #ff4d4d; border-radius:10px; padding:12px; font-size:18px; margin:8px 0; user-select:all; cursor:pointer; }
+  .line-card { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:14px; margin:10px 0; }
+  .line-name { font-weight:700; font-size:17px; }
+  .line-num { color:#58a6ff; user-select:all; margin:4px 0; }
+  .line-state { font-size:13px; color:#8b949e; margin:6px 0; }
+  .line-state.active { color:#3fb950; font-weight:600; }
+  .line-state.ring { color:#f0883e; font-weight:600; }
+  .status { min-height:22px; color:#8b949e; margin:10px 0; font-size:14px; }
+  .hidden { display:none; }
+  .log { margin-top:18px; font-size:13px; color:#8b949e; max-height:140px; overflow-y:auto; }
+  .log div { padding:3px 0; border-bottom:1px solid #21262d; }
+  label.chk { font-size:14px; color:#8b949e; display:block; margin:10px 0; }
 </style>
 </head>
 <body>
+<div class="card">
+  <h1>112</h1>
+  <p class="sub">Единая служба экстренных вызовов</p>
 
-<!-- Выбор роли -->
-<div id="loginBox">
-  <h3>🛒 Касса «Магниточка»</h3>
-  <p class="muted">Кто входит на терминал?</p>
-  <div class="roleBtns">
-    <button type="button" class="btn btn-b" onclick="showCashierLogin()">🧑‍💼 Кассир</button>
-    <button type="button" class="btn btn-v" onclick="showAdminLogin()">🔐 Администратор</button>
+  <div id="roleSelect">
+    <button class="btn-red" onclick="startOperator()">Я оператор (принимать звонки)</button>
+    <button class="btn-green" onclick="showCaller()">Я вызываю службы</button>
   </div>
 
-  <!-- Вход кассира -->
-  <div id="cashierForm" style="display:none;margin-top:14px">
-    <input type="text" id="cashName" placeholder="Имя кассира" onkeydown="if(event.key==='Enter')openShift()">
-    <button type="button" class="btn" style="width:100%" onclick="openShift()">Открыть смену</button>
-    <p id="loginErr" class="muted" style="display:none;color:#ef4444">Введите имя кассира</p>
+  <!-- ОПЕРАТОР -->
+  <div id="operator" class="hidden">
+    <p>Код вашей диспетчерской (придумайте, латиницей):</p>
+    <input id="opCode" value="city-rp">
+    <label class="chk"><input type="checkbox" id="autoAnswer"> Автоответ: сразу поставить на удержание с музыкой</label>
+    <button class="btn-red" onclick="openLines()">Открыть диспетчерскую</button>
+    <div id="lines"></div>
+    <div class="status" id="opStatus"></div>
+    <h3 style="margin-top:16px">Журнал вызовов</h3>
+    <div class="log" id="log"></div>
   </div>
 
-  <!-- Вход администратора -->
-  <div id="adminForm" style="display:none;margin-top:14px">
-    <input type="text" id="admLogin" placeholder="Логин (напр. Зинченко А.А.)">
-    <input type="password" id="admPass" placeholder="Пароль" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button type="button" class="btn btn-v" style="width:100%" onclick="adminLogin()">Войти как администратор</button>
-    <p id="admErr" class="muted" style="display:none;color:#ef4444">Неверный логин или пароль</p>
-  </div>
-</div>
-
-<!-- Панель администратора -->
-<div id="adminPanel" style="display:none">
-  <div class="topbar">
-    <div>
-      <strong>🔐 Администратор — <span id="admWho"></span></strong>
-      <div class="shiftline">Изменения каталога сохраняются автоматически</div>
-    </div>
-    <div>
-      <button type="button" class="btn btn-b" onclick="admGoCashier()">Перейти к кассе</button>
-      <button type="button" class="btn btn-r" onclick="admLogout()">Выйти</button>
-    </div>
-  </div>
-  <div class="wrap">
-    <div class="col">
-      <div class="card">
-        <h3>Каталог товаров (<span id="admCount"></span>)</h3>
-        <table>
-          <thead><tr><th>Код</th><th>Название</th><th>Цена</th><th>Тип</th><th></th></tr></thead>
-          <tbody id="admProdBody"></tbody>
-        </table>
-        <div class="rowbtns" style="margin-top:10px">
-          <div><input type="text" id="aCode" placeholder="Код (штрихкод)"></div>
-          <div><input type="text" id="aName" placeholder="Название"></div>
-          <div><input type="number" id="aPrice" step="0.01" min="0" placeholder="Цена"></div>
-          <div><select id="aType"><option value="pcs">Штучный</option><option value="kg">Весовой (за кг)</option></select></div>
-          <div><button type="button" class="btn btn-b" onclick="admAdd()">+ Добавить</button></div>
-        </div>
-      </div>
-    </div>
-    <div class="col" style="max-width:380px">
-      <div class="card">
-        <h3>Касса: деньги</h3>
-        <p class="muted">Внесение и изъятие отражаются в X/Z-отчётах.</p>
-        <button type="button" class="btn btn-ok" style="width:100%" onclick="cashInModal()">💰 Внесение денег в ящик</button>
-        <button type="button" class="btn btn-r" style="width:100%;margin-top:8px" onclick="cashOutModal()">🏧 Изъятие денег из ящика</button>
-        <p class="muted" style="margin-top:12px">Наличных в ящике: <b id="admCash" style="color:#eab308"></b></p>
-        <p class="muted" id="admShiftInfo"></p>
-      </div>
-    </div>
+  <!-- ВЫЗЫВАЮЩИЙ -->
+  <div id="caller" class="hidden">
+    <p>Введите код диспетчерской:</p>
+    <input id="callCode" value="city-rp">
+    <button class="btn-red" onclick="makeCall('112')">Вызвать 112</button>
+    <button class="btn-green" onclick="makeCall('103')">Вызвать 103 (скорая)</button>
+    <button class="btn-grey" onclick="makeCall('102')">Вызвать 102 (полиция)</button>
+    <div class="status" id="callStatus"></div>
+    <button class="btn-grey hidden" id="btnEndCall" onclick="endCall()">Завершить вызов</button>
   </div>
 </div>
-
-<!-- Касса -->
-<div id="app" style="display:none">
-  <div class="topbar">
-    <div>
-      <strong>🛒 Касса</strong>
-      <div class="shiftline" id="shiftInfo"></div>
-    </div>
-    <div class="t" id="clock"></div>
-    <div class="t" id="drawerInfo"></div>
-    <button type="button" class="btn btn-g" onclick="xReport()">X-отчёт (F10)</button>
-    <button type="button" class="btn btn-r" onclick="closeShift()">Закрыть смену (F9)</button>
-  </div>
-
-  <div class="wrap">
-    <div class="col">
-      <div class="card">
-        <h3>Товары</h3>
-        <input type="text" id="search" placeholder="Штрихкод или название товара">
-        <div class="grid" id="prodGrid"></div>
-        <p class="keysHint">F1 справка · F2 поиск · F3 оплата нал. · Ctrl+Enter карта · F4 кол-во · F5 скидка · F7 карта кл-та</p>
-      </div>
-
-      <div class="card" style="margin-top:14px">
-        <h3>Журнал смены</h3>
-        <table>
-          <thead><tr><th>Чек №</th><th>Время</th><th>Сумма</th><th>Оплата</th><th>Скидка</th></tr></thead>
-          <tbody id="logBody"><tr><td colspan="5" class="muted">Чеков пока нет</td></tr></tbody>
-        </table>
-        <button type="button" class="btn btn-r" style="margin-top:10px;width:100%" onclick="voidLast()">↩ Возврат последнего чека (F8)</button>
-      </div>
-    </div>
-
-    <div class="col" style="max-width:500px">
-      <div class="card">
-        <h3>Чек <span class="small" id="discInfo"></span></h3>
-        <table>
-          <thead><tr><th>Товар</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr></thead>
-          <tbody id="cartBody"><tr><td colspan="5" class="muted">Корзина пуста</td></tr></tbody>
-        </table>
-        <div class="total">
-          <span>ИТОГО:</span>
-          <b id="cartTotal">0.00 ₽</b>
-        </div>
-        <p class="disc" id="discRow" style="display:none"></p>
-        <div class="fnrow">
-          <button type="button" class="btn btn-b" onclick="focusSearch()">F2<span>Поиск</span></button>
-          <button type="button" class="btn btn-b" onclick="qtyModal()">F4<span>Кол-во/вес</span></button>
-          <button type="button" class="btn btn-b" onclick="discountModal()">F5<span>Скидка %</span></button>
-          <button type="button" class="btn btn-b" onclick="cardModal()">F7<span>Карта кл-та</span></button>
-          <button type="button" class="btn btn-r" onclick="delLine()">F6<span>Уд. строку</span></button>
-          <button type="button" class="btn btn-g" onclick="clearCart()">Esc<span>Очистить</span></button>
-          <button type="button" class="btn btn-ok" onclick="pay('Карта')">Ctrl+Ent<span>Оплата картой</span></button>
-          <button type="button" class="btn btn-ok" onclick="pay('Наличные')">F3 💵<span>Оплата нал.</span></button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modalBg"><div id="modal"></div></div>
 
 <script>
-// ===== НАСТРОЙКИ =====
-var VAT = 20;
-var SHOP_NAME = 'ПРОДУКТОВЫЙ МАГАЗИН «МАГНИТОЧКА»';
-var CARD_DISCOUNT = 5;
-var MAX_CHECK_DISCOUNT = 30;
+const SERVICE_NAMES = { '112': 'Единая служба 112', '103': 'Скорая помощь', '102': 'Полиция' };
+let lines = {};            // состояние линий оператора
+let micStream = null, muted = false;
+let audioCtx = null, ringTimer = null;
 
-// Администраторы: логин -> пароль
-var ADMINS = {
-  'зинченко а.а.': '7401'
-};
-var ADMIN_NAMES = { 'зинченко а.а.': 'Зинченко Артём Анатольевич' };
-
-// Каталог: 40 товаров, type 'pcs' — штучный, 'kg' — весовой
-var DEFAULT_PRODUCTS = [
-  // Хлеб и выпечка
-  { code:'101', name:'Хлеб белый',          price:45.00,  type:'pcs' },
-  { code:'102', name:'Хлеб бородинский',    price:52.00,  type:'pcs' },
-  { code:'103', name:'Батон нарезной',      price:48.00,  type:'pcs' },
-  { code:'104', name:'Булочка с маком',     price:35.00,  type:'pcs' },
-  { code:'105', name:'Лаваш армянский',     price:55.00,  type:'pcs' },
-  // Молочка
-  { code:'201', name:'Молоко 1 л',          price:89.90,  type:'pcs' },
-  { code:'202', name:'Кефир 1 л',           price:85.00,  type:'pcs' },
-  { code:'203', name:'Сметана 20% 300 г',   price:119.00, type:'pcs' },
-  { code:'204', name:'Творог 5% 200 г',     price:99.00,  type:'pcs' },
-  { code:'205', name:'Масло сливочное 180 г', price:189.00, type:'pcs' },
-  { code:'206', name:'Сыр Гауда 300 г',     price:249.00, type:'pcs' },
-  { code:'207', name:'Йогурт питьевой',     price:59.00,  type:'pcs' },
-  // Мясо и рыба (весовые)
-  { code:'301', name:'Свинина',             price:449.00, type:'kg' },
-  { code:'302', name:'Говядина',            price:549.00, type:'kg' },
-  { code:'303', name:'Курица окорочка',     price:259.00, type:'kg' },
-  { code:'304', name:'Филе куриное',        price:329.00, type:'kg' },
-  { code:'305', name:'Фарш домашний',       price:399.00, type:'kg' },
-  { code:'306', name:'Горбуша свежеморож.', price:429.00, type:'kg' },
-  { code:'307', name:'Минтай',              price:239.00, type:'kg' },
-  // Колбасы
-  { code:'308', name:'Колбаса варёная',     price:199.00, type:'pcs' },
-  { code:'309', name:'Колбаса копчёная',    price:289.00, type:'pcs' },
-  { code:'310', name:'Сосиски молочные',    price:229.00, type:'pcs' },
-  // Овощи и фрукты (весовые)
-  { code:'401', name:'Картофель',           price:39.00,  type:'kg' },
-  { code:'402', name:'Морковь',             price:49.00,  type:'kg' },
-  { code:'403', name:'Лук репчатый',        price:35.00,  type:'kg' },
-  { code:'404', name:'Капуста белокочанная', price:29.00, type:'kg' },
-  { code:'405', name:'Огурцы',              price:129.00, type:'kg' },
-  { code:'406', name:'Помидоры',            price:159.00, type:'kg' },
-  { code:'407', name:'Яблоки',              price:129.00, type:'kg' },
-  { code:'408', name:'Бананы',              price:99.00,  type:'kg' },
-  { code:'409', name:'Апельсины',           price:119.00, type:'kg' },
-  { code:'410', name:'Виноград',            price:249.00, type:'kg' },
-  // Бакалея
-  { code:'501', name:'Яйца 10 шт',          price:109.00, type:'pcs' },
-  { code:'502', name:'Рис 900 г',           price:99.00,  type:'pcs' },
-  { code:'503', name:'Гречка 900 г',        price:89.00,  type:'pcs' },
-  { code:'504', name:'Макароны 450 г',      price:65.00,  type:'pcs' },
-  { code:'505', name:'Мука 2 кг',           price:79.00,  type:'pcs' },
-  { code:'506', name:'Сахар 1 кг',          price:79.00,  type:'pcs' },
-  { code:'507', name:'Пельмени 800 г',      price:329.00, type:'pcs' },
-  // Напитки и сладкое
-  { code:'601', name:'Вода 0,5 л',          price:39.00,  type:'pcs' },
-  { code:'602', name:'Сок апельсиновый 1 л', price:99.00, type:'pcs' },
-  { code:'603', name:'Чай чёрный 100 пак.', price:119.00, type:'pcs' },
-  { code:'604', name:'Кофе молотый 250 г',  price:399.00, type:'pcs' },
-  { code:'605', name:'Шоколад молочный',    price:79.00,  type:'pcs' },
-  { code:'606', name:'Печенье юбилейное',   price:65.00,  type:'pcs' },
-  { code:'607', name:'Мороженое эскимо',    price:89.00,  type:'pcs' },
-  { code:'608', name:'Энергетик 0,45 л',    price:129.00, type:'pcs' }
-];
-var PRODUCTS = [];
-
-// ===== СОСТОЯНИЕ =====
-var cart = [];
-var shift = null;
-var lastReceipt = null;
-var receiptCounter = 1;
-var checkDiscount = 0;
-var discCard = null;
-var selectedLine = 0;
-var drawerCash = 0;
-var currentAdmin = null;
-
-function loadState(){
-  try{
-    var s = localStorage.getItem('kassa_shift');
-    if(s) shift = JSON.parse(s);
-    var c = localStorage.getItem('kassa_counter');
-    if(c) receiptCounter = parseInt(c,10)||1;
-    var p = localStorage.getItem('kassa_products');
-    PRODUCTS = p ? JSON.parse(p) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-    var d = localStorage.getItem('kassa_drawer');
-    drawerCash = d ? parseFloat(d)||0 : 0;
-  }catch(e){ PRODUCTS = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)); }
+function ensureCtx() {
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
 }
-function saveState(){
-  try{
-    localStorage.setItem('kassa_shift', JSON.stringify(shift));
-    localStorage.setItem('kassa_counter', String(receiptCounter));
-    localStorage.setItem('kassa_drawer', String(drawerCash));
-  }catch(e){}
+function beep(freq, when, dur, vol, dest) {
+  const ctx = ensureCtx();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine'; o.frequency.value = freq; g.gain.value = vol;
+  o.connect(g); g.connect(dest || ctx.destination);
+  o.start(when); o.stop(when + dur);
 }
-function saveProducts(){
-  try{ localStorage.setItem('kassa_products', JSON.stringify(PRODUCTS)); }catch(e){}
+// Гудки ожидания у вызывающего (российский стандарт: 1 с тона / 4 с паузы)
+function startRingback() {
+  stopSound();
+  ringTimer = setInterval(() => beep(425, ensureCtx().currentTime, 1, 0.1), 5000);
+  beep(425, ensureCtx().currentTime, 1, 0.1);
+}
+// Рингтон входящего у оператора
+function startIncomingRing() {
+  stopSound();
+  ringTimer = setInterval(() => {
+    const t = ensureCtx().currentTime;
+    beep(700, t, 0.3, 0.12); beep(700, t + 0.4, 0.3, 0.12);
+  }, 2500);
+  const t = ensureCtx().currentTime;
+  beep(700, t, 0.3, 0.12); beep(700, t + 0.4, 0.3, 0.12);
+}
+function stopSound() { if (ringTimer) { clearInterval(ringTimer); ringTimer = null; } }
+// Музыка удержания — генерируем звуковой поток для линии
+function makeHoldStream() {
+  const ctx = ensureCtx();
+  const dest = ctx.createMediaStreamDestination();
+  const g = ctx.createGain(); g.gain.value = 0.07; g.connect(dest);
+  const osc = ctx.createOscillator(); osc.type = 'sine'; osc.connect(g); osc.start();
+  const notes = [392, 523, 440, 523]; let i = 0;
+  setInterval(() => { osc.frequency.value = notes[i++ % notes.length]; }, 500);
+  return dest.stream;
 }
 
-// ===== ВХОД =====
-function showCashierLogin(){
-  document.getElementById('cashierForm').style.display='block';
-  document.getElementById('adminForm').style.display='none';
-  document.getElementById('cashName').focus();
+/* ---------- ОПЕРАТОР ---------- */
+function startOperator() {
+  document.getElementById('roleSelect').classList.add('hidden');
+  document.getElementById('operator').classList.remove('hidden');
 }
-function showAdminLogin(){
-  document.getElementById('adminForm').style.display='block';
-  document.getElementById('cashierForm').style.display='none';
-  document.getElementById('admLogin').focus();
-}
-function norm(s){ return String(s||'').toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ').trim(); }
+function safeId(s) { return s.toLowerCase().replace(/[^a-z0-9-_]/g, ''); }
 
-function openShift(){
-  var name = document.getElementById('cashName').value.trim();
-  if(!name){ document.getElementById('loginErr').style.display='block'; return; }
-  shift = { cashier:name, openedAt:new Date().toISOString(), receipts:[], cashTotal:0, cardTotal:0, cashIn:0, cashOut:0 };
-  enterCashier();
-}
-function enterCashier(){
-  document.getElementById('loginBox').style.display='none';
-  document.getElementById('adminPanel').style.display='none';
-  document.getElementById('app').style.display='block';
-  checkDiscount=0; discCard=null; selectedLine=0;
-  updateShiftInfo(); renderProducts(); renderCart(); renderLog();
-}
+function openLines() {
+  const code = safeId(document.getElementById('opCode').value);
+  if (!code) { document.getElementById('opStatus').textContent = 'Введите код диспетчерской'; return; }
+  const box = document.getElementById('lines');
+  box.innerHTML = '';
+  ['112', '103', '102'].forEach(num => {
+    const id = num + '-' + code;
+    const card = document.createElement('div');
+    card.className = 'line-card';
+    card.innerHTML =
+      '<div class="line-name">' + SERVICE_NAMES[num] + '</div>' +
+      '<div class="line-num" title="нажмите, чтобы скопировать">' + id + '</div>' +
+      '<div class="line-state" id="state-' + num + '">свободна</div>' +
+      '<div id="ctrl-' + num + '"></div>';
+    card.querySelector('.line-num').onclick = () => navigator.clipboard && navigator.clipboard.writeText(id);
+    box.appendChild(card);
+    lines[num] = { peer: null, call: null, state: 'free' };
 
-function adminLogin(){
-  var l = norm(document.getElementById('admLogin').value);
-  var p = document.getElementById('admPass').value.trim();
-  if(ADMINS[l] && ADMINS[l]===p){
-    currentAdmin = ADMIN_NAMES[l];
-    document.getElementById('admErr').style.display='none';
-    document.getElementById('admWho').innerText = currentAdmin;
-    openAdminPanel();
-  } else {
-    document.getElementById('admErr').style.display='block';
-  }
-}
-function openAdminPanel(){
-  document.getElementById('loginBox').style.display='none';
-  document.getElementById('app').style.display='none';
-  document.getElementById('adminPanel').style.display='block';
-  renderAdminProducts(); updateAdminInfo();
-}
-function admGoCashier(){
-  if(shift){ enterCashier(); }
-  else { alert('Смена не открыта. Сначала откройте смену как кассир.'); showCashierLogin(); document.getElementById('loginBox').style.display='block'; document.getElementById('adminPanel').style.display='none'; }
-}
-function admLogout(){
-  currentAdmin = null;
-  document.getElementById('adminPanel').style.display='none';
-  document.getElementById('loginBox').style.display='block';
-  document.getElementById('admPass').value='';
-}
-function updateAdminInfo(){
-  document.getElementById('admCash').innerText = drawerCash.toFixed(2)+' ₽';
-  document.getElementById('admShiftInfo').innerText = shift
-    ? 'Смена открыта: кассир '+shift.cashier+', чеков: '+shift.receipts.length
-    : 'Смена закрыта';
-}
-
-// ===== СМЕНА =====
-function closeShift(){
-  if(!confirm('Закрыть смену и напечатать Z-отчёт? Чеки обнулятся.')) return;
-  var tot=0, disc=0;
-  for(var i=0;i<shift.receipts.length;i++){ tot += shift.receipts[i].total; disc += shift.receipts[i].discount; }
-  var msg =
-    '========== Z-ОТЧЁТ ==========\n'+
-    SHOP_NAME+'\n'+
-    'Кассир: '+shift.cashier+'\n'+
-    'Открыта: '+fmtTime(shift.openedAt)+'  Закрыта: '+fmtTime(new Date().toISOString())+'\n'+
-    '----------------------------\n'+
-    'Чеков за смену: '+shift.receipts.length+'\n'+
-    'Выручка всего: '+tot.toFixed(2)+' ₽\n'+
-    '  наличные: '+shift.cashTotal.toFixed(2)+' ₽\n'+
-    '  карта: '+shift.cardTotal.toFixed(2)+' ₽\n'+
-    'Скидок предоставлено: '+disc.toFixed(2)+' ₽\n'+
-    'Внесено в ящик: '+shift.cashIn.toFixed(2)+' ₽\n'+
-    'Изъято из ящика: '+shift.cashOut.toFixed(2)+' ₽\n'+
-    'Остаток в ящике: '+drawerCash.toFixed(2)+' ₽\n'+
-    'Номер последнего чека: ЧК-'+String(receiptCounter-1).padStart(4,'0')+'\n'+
-    '============================';
-  alert(msg);
-  shift = null; cart=[]; lastReceipt=null;
-  localStorage.removeItem('kassa_shift');
-  document.getElementById('app').style.display='none';
-  document.getElementById('loginBox').style.display='block';
-  document.getElementById('cashName').value='';
-}
-function updateShiftInfo(){
-  document.getElementById('shiftInfo').innerText = 'Кассир: '+shift.cashier+' | Смена с '+fmtTime(shift.openedAt);
-  document.getElementById('drawerInfo').innerText = '💵 в ящике: '+drawerCash.toFixed(2)+' ₽';
-}
-
-// ===== КАТАЛОГ =====
-function renderProducts(){
-  var q = document.getElementById('search').value.trim().toLowerCase();
-  var grid = document.getElementById('prodGrid');
-  grid.innerHTML='';
-  var list = PRODUCTS.filter(function(p){
-    return !q || p.name.toLowerCase().indexOf(q)!==-1 || p.code===q;
-  });
-  if(list.length===0){ grid.innerHTML='<div class="muted">Товар не найден</div>'; return; }
-  for(var i=0;i<list.length;i++){
-    (function(p){
-      var d=document.createElement('div');
-      d.className='pitem';
-      d.innerHTML='<div class="nm">'+p.name+'</div><div class="pr">'+(p.type==='kg'? p.price.toFixed(2)+' ₽/кг' : p.price.toFixed(2)+' ₽')+'</div>'+(p.type==='kg'?'<span class="kg">кг</span>':'');
-      d.onclick=function(){ addToCart(p, 1); };
-      grid.appendChild(d);
-    })(list[i]);
-  }
-}
-function findProduct(q){
-  q = String(q).trim().toLowerCase();
-  if(!q) return null;
-  for(var i=0;i<PRODUCTS.length;i++) if(PRODUCTS[i].code===q) return PRODUCTS[i];
-  for(var j=0;j<PRODUCTS.length;j++) if(PRODUCTS[j].name.toLowerCase()===q) return PRODUCTS[j];
-  for(var k=0;k<PRODUCTS.length;k++) if(PRODUCTS[k].name.toLowerCase().indexOf(q)!==-1) return PRODUCTS[k];
-  return null;
-}
-function focusSearch(){
-  document.getElementById('search').focus();
-  document.getElementById('search').select();
-}
-
-// ===== ЧЕК =====
-function addToCart(p, qty, weight){
-  var q = weight || qty || 1;
-  for(var i=0;i<cart.length;i++){
-    if(cart[i].code===p.code && p.type==='pcs'){ cart[i].qty+=q; selectedLine=i; renderCart(); return; }
-  }
-  cart.push({code:p.code, name:p.name, price:p.price, qty:q, type:p.type||'pcs'});
-  selectedLine = cart.length-1;
-  renderCart();
-}
-function chQty(idx, delta){
-  cart[idx].qty += delta;
-  if(cart[idx].qty<=0) cart.splice(idx,1);
-  if(selectedLine>=cart.length) selectedLine=Math.max(0,cart.length-1);
-  renderCart();
-}
-function delLine(){
-  if(cart.length===0) return;
-  cart.splice(selectedLine,1);
-  if(selectedLine>=cart.length) selectedLine=Math.max(0,cart.length-1);
-  renderCart();
-}
-function clearCart(){ cart=[]; checkDiscount=0; discCard=null; selectedLine=0; renderCart(); }
-
-function subtotal(){
-  var s=0;
-  for(var i=0;i<cart.length;i++) s += cart[i].price*cart[i].qty;
-  return s;
-}
-function discountSum(){
-  var s = subtotal();
-  var d = 0;
-  if(checkDiscount>0) d += s*checkDiscount/100;
-  if(discCard) d += (s - d) * CARD_DISCOUNT/100;
-  return d;
-}
-function cartSum(){ return Math.max(0, subtotal() - discountSum()); }
-
-function renderCart(){
-  var body=document.getElementById('cartBody');
-  body.innerHTML='';
-  if(cart.length===0){
-    body.innerHTML='<tr><td colspan="5" class="muted">Корзина пуста</td></tr>';
-  } else {
-    for(var i=0;i<cart.length;i++){
-      (function(idx){
-        var c=cart[idx];
-        var r=body.insertRow(-1);
-        if(idx===selectedLine) r.style.background='rgba(234,179,8,.10)';
-        r.insertCell(0).innerText=c.name+(c.type==='kg'?' (кг)':'');
-        var qtd=r.insertCell(1);
-        var bm=document.createElement('button'); bm.innerText='−';
-        bm.onclick=function(){ selectedLine=idx; chQty(idx,-1); };
-        var lbl = c.type==='kg' ? c.qty.toFixed(3)+' кг' : String(c.qty);
-        var sp=document.createElement('span'); sp.innerText=' '+lbl+' '; sp.style.margin='0 3px'; sp.style.fontSize='12px';
-        var bp=document.createElement('button'); bp.innerText='+';
-        bp.onclick=function(){ selectedLine=idx; chQty(idx,1); };
-        qtd.appendChild(bm); qtd.appendChild(sp); qtd.appendChild(bp);
-        r.insertCell(2).innerText=c.price.toFixed(2)+' ₽'+(c.type==='kg'?'/кг':'');
-        r.insertCell(3).innerText=(c.price*c.qty).toFixed(2)+' ₽';
-        var atd=r.insertCell(4);
-        var bx=document.createElement('button'); bx.innerText='✕';
-        bx.onclick=function(){ delPos(idx); };
-        atd.appendChild(bx);
-      })(i);
-    }
-  }
-  var ds=discountSum(), tot=cartSum();
-  document.getElementById('cartTotal').innerText = tot.toFixed(2)+' ₽';
-  var dr=document.getElementById('discRow');
-  var di=document.getElementById('discInfo');
-  if(ds>0){
-    dr.style.display='block';
-    dr.innerText='Скидки: −'+ds.toFixed(2)+' ₽'+(checkDiscount>0?' (чек '+checkDiscount+'%)':'')+(discCard?' (карта '+discCard+', '+CARD_DISCOUNT+'%)':'');
-  } else dr.style.display='none';
-  di.innerText = discCard ? ' · карта '+discCard : '';
-}
-function delPos(idx){ cart.splice(idx,1); if(selectedLine>=cart.length) selectedLine=Math.max(0,cart.length-1); renderCart(); }
-
-// ===== МОДАЛКИ =====
-function openModal(html){
-  document.getElementById('modalBg').style.display='flex';
-  document.getElementById('modal').innerHTML=html;
-}
-function closeModal(){ document.getElementById('modalBg').style.display='none'; }
-
-function qtyModal(){
-  if(cart.length===0){ alert('Сначала добавьте товар'); return; }
-  var c=cart[selectedLine];
-  var hint = c.type==='kg' ? 'Вес в килограммах (например 0.754)' : 'Количество штук';
-  openModal(
-    '<h3>F4 — Количество / вес</h3>'+
-    '<p class="muted">'+c.name+' · сейчас: '+(c.type==='kg'? c.qty.toFixed(3)+' кг' : c.qty+' шт')+'</p>'+
-    '<p class="muted">'+hint+'</p>'+
-    '<input type="number" id="qtyIn" step="'+(c.type==='kg'?'0.001':'1')+'" min="0" value="'+(c.type==='kg'?c.qty.toFixed(3):c.qty)+'">'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="closeModal()">Отмена</button>'+
-      '<button type="button" class="btn btn-ok" onclick="qtyApply()">Применить</button>'+
-    '</div>'
-  );
-  var inp=document.getElementById('qtyIn'); inp.focus(); inp.select();
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter') qtyApply(); });
-}
-function qtyApply(){
-  var v=parseFloat(document.getElementById('qtyIn').value);
-  var c=cart[selectedLine];
-  if(isNaN(v)||v<=0){ alert('Некорректное значение'); return; }
-  c.qty = c.type==='kg' ? Math.round(v*1000)/1000 : Math.round(v);
-  closeModal(); renderCart();
-}
-
-function discountModal(){
-  openModal(
-    '<h3>F5 — Скидка на чек</h3>'+
-    '<p class="muted">Процент скидки на весь чек (0–'+MAX_CHECK_DISCOUNT+'%).</p>'+
-    '<input type="number" id="discIn" min="0" max="'+MAX_CHECK_DISCOUNT+'" value="'+checkDiscount+'">'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="checkDiscount=0;discCard=null;renderCart();closeModal()">Сбросить всё</button>'+
-      '<button type="button" class="btn btn-ok" onclick="discountApply()">Применить</button>'+
-    '</div>'
-  );
-  var inp=document.getElementById('discIn'); inp.focus(); inp.select();
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter') discountApply(); });
-}
-function discountApply(){
-  var v=parseInt(document.getElementById('discIn').value,10);
-  if(isNaN(v)||v<0||v>MAX_CHECK_DISCOUNT){ alert('Скидка от 0 до '+MAX_CHECK_DISCOUNT+'%'); return; }
-  checkDiscount=v; closeModal(); renderCart();
-}
-
-var CARD_DB = { '1001':'Иванов И.И.', '1002':'Петрова А.С.', '1003':'Сидоров П.П.' };
-function cardModal(){
-  openModal(
-    '<h3>F7 — Карта клиента</h3>'+
-    '<p class="muted">Номер карты. Скидка по карте — '+CARD_DISCOUNT+'%. Тестовые: 1001, 1002, 1003.</p>'+
-    '<input type="text" id="cardIn" value="'+(discCard||'')+'" placeholder="Номер карты">'+
-    '<p class="muted" id="cardWho"></p>'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="discCard=null;renderCart();closeModal()">Убрать карту</button>'+
-      '<button type="button" class="btn btn-ok" onclick="cardApply()">Применить</button>'+
-    '</div>'
-  );
-  var inp=document.getElementById('cardIn'); inp.focus(); inp.select();
-  showCardWho();
-  inp.addEventListener('input',showCardWho);
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter') cardApply(); });
-}
-function showCardWho(){
-  var v=document.getElementById('cardIn').value.trim();
-  document.getElementById('cardWho').innerText = CARD_DB[v] ? 'Карта: '+CARD_DB[v] : (v? 'Карта не найдена в базе' : '');
-}
-function cardApply(){
-  var v=document.getElementById('cardIn').value.trim();
-  if(v && !CARD_DB[v]){ if(!confirm('Карты нет в базе. Применить всё равно?')) return; }
-  discCard = v || null;
-  closeModal(); renderCart();
-}
-
-// ===== ОПЛАТА =====
-function pay(method){
-  if(cart.length===0){ alert('Корзина пуста — добавьте товар'); return; }
-  var total=cartSum();
-  if(method==='Карта'){
-    if(!confirm('Оплата картой на '+total.toFixed(2)+' ₽. Подтвердить после считывания?')) return;
-    finishSale(method, total, 0);
-    return;
-  }
-  openModal(
-    '<h3>Оплата наличными</h3>'+
-    '<p class="muted">К оплате: <b style="color:#eab308">'+total.toFixed(2)+' ₽</b></p>'+
-    '<input type="number" id="payAmt" step="0.01" min="0" placeholder="Сумма от клиента">'+
-    '<div class="fnrow">'+
-      '<button type="button" class="btn btn-g" onclick="quickCash(100)">100</button>'+
-      '<button type="button" class="btn btn-g" onclick="quickCash(500)">500</button>'+
-      '<button type="button" class="btn btn-g" onclick="quickCash(1000)">1000</button>'+
-      '<button type="button" class="btn btn-g" onclick="quickCash(2000)">2000</button>'+
-      '<button type="button" class="btn btn-g" onclick="quickCash(5000)">5000</button>'+
-      '<button type="button" class="btn btn-g" onclick="quickCashExact()">Точно</button>'+
-    '</div>'+
-    '<p class="change" id="chg"></p>'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="closeModal()">Отмена (Esc)</button>'+
-      '<button type="button" class="btn btn-ok" onclick="confirmCash()">Принять оплату</button>'+
-    '</div>'
-  );
-  var inp=document.getElementById('payAmt');
-  inp.oninput=calcChange;
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter') confirmCash(); });
-  inp.focus();
-}
-function quickCash(v){ document.getElementById('payAmt').value=v; calcChange(); }
-function quickCashExact(){ document.getElementById('payAmt').value=cartSum().toFixed(2); calcChange(); }
-function calcChange(){
-  var total=cartSum();
-  var amt=parseFloat(document.getElementById('payAmt').value);
-  var el=document.getElementById('chg');
-  if(isNaN(amt)){ el.innerText=''; return; }
-  if(amt<total){ el.style.color='#ef4444'; el.innerText='Мало денег: не хватает '+(total-amt).toFixed(2)+' ₽'; }
-  else { el.style.color='#22c55e'; el.innerText='Сдача: '+(amt-total).toFixed(2)+' ₽'; }
-}
-function confirmCash(){
-  var total=cartSum();
-  var amt=parseFloat(document.getElementById('payAmt').value);
-  if(isNaN(amt)||amt<total){ alert('Внесённой суммы недостаточно'); return; }
-  finishSale('Наличные', total, amt-total);
-}
-
-function finishSale(method, total, change){
-  var num='ЧК-'+String(receiptCounter).padStart(4,'0');
-  receiptCounter++;
-  var lines = cart.map(function(c){ return {name:c.name, price:c.price, qty:c.qty, type:c.type, sum:c.price*c.qty}; });
-  var disc = discountSum();
-  var rec = {
-    num:num, time:new Date().toISOString(), method:method,
-    total:total, change:change, discount:disc,
-    cashier:shift.cashier, card:discCard, discPct:checkDiscount,
-    lines:lines
-  };
-  shift.receipts.push(rec);
-  if(method==='Наличные'){ shift.cashTotal += total; drawerCash += total - change; }
-  else shift.cardTotal += total;
-  lastReceipt = rec;
-  saveState();
-
-  var vat = total/(1+VAT/100);
-  var rc =
-    '   '+SHOP_NAME+'\n'+
-    '  ИНН 7448000000 · Касса №2\n'+
-    '================================\n'+
-    'ЧЕК '+num+' (продажа)\n'+
-    'Дата: '+fmtTime(rec.time)+'\n'+
-    'Кассир: '+shift.cashier+'\n'+
-    (discCard? 'Карта клиента: '+discCard+'\n':'')+
-    '--------------------------------\n';
-  for(var i=0;i<lines.length;i++){
-    rc += lines[i].name+(lines[i].type==='kg'?', кг':'')+'\n  '+
-      (lines[i].type==='kg'? lines[i].qty.toFixed(3)+' x '+lines[i].price.toFixed(2)+' ₽/кг' : lines[i].qty+' x '+lines[i].price.toFixed(2))+
-      ' = '+lines[i].sum.toFixed(2)+' ₽\n';
-  }
-  rc +=
-    '--------------------------------\n'+
-    'Сумма: '+subtotal().toFixed(2)+' ₽\n'+
-    (disc>0? 'Скидка: −'+disc.toFixed(2)+' ₽\n':'')+
-    'ИТОГО: '+total.toFixed(2)+' ₽\n'+
-    'в т.ч. НДС '+VAT+'%: '+vat.toFixed(2)+' ₽\n'+
-    'Оплата: '+method+'\n'+
-    (method==='Наличные'&&change>0? 'Внесено, сдача: '+change.toFixed(2)+' ₽\n':'')+
-    'Чек № в ФН: '+String(receiptCounter-1).padStart(6,'0')+'\n'+
-    '================================\n'+
-    '     СПАСИБО ЗА ПОКУПКУ!\n'+
-    '  Возврат — в течение 14 дней';
-
-  cart=[]; checkDiscount=0; selectedLine=0;
-  renderCart(); renderLog(); updateShiftInfo();
-  openModal(
-    '<h3>✔ Чек '+num+'</h3>'+
-    '<textarea id="receiptOut" readonly>'+rc+'</textarea>'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="copyReceipt()">Скопировать</button>'+
-      '<button type="button" class="btn btn-ok" onclick="closeModal()">Новая продажа (Enter)</button>'+
-    '</div>'
-  );
-}
-
-function copyReceipt(){
-  var a=document.getElementById('receiptOut');
-  a.select();
-  if(navigator.clipboard) navigator.clipboard.writeText(a.value);
-  else document.execCommand('copy');
-}
-function voidLast(){
-  if(!lastReceipt){ alert('Нет чека для возврата'); return; }
-  if(!confirm('Аннулировать чек '+lastReceipt.num+' на '+lastReceipt.total.toFixed(2)+' ₽?')) return;
-  for(var i=0;i<shift.receipts.length;i++){
-    if(shift.receipts[i].num===lastReceipt.num){
-      if(shift.receipts[i].method==='Наличные'){
-        shift.cashTotal -= shift.receipts[i].total;
-        drawerCash -= shift.receipts[i].total;
-      } else shift.cardTotal -= shift.receipts[i].total;
-      shift.receipts.splice(i,1);
-      break;
-    }
-  }
-  lastReceipt=null; saveState(); renderLog(); updateShiftInfo();
-}
-
-// ===== ОТЧЁТЫ =====
-function xReport(){
-  if(!shift){ alert('Смена не открыта'); return; }
-  var tot=0, disc=0;
-  for(var i=0;i<shift.receipts.length;i++){ tot += shift.receipts[i].total; disc += shift.receipts[i].discount; }
-  var msg =
-    '========== X-ОТЧЁТ ==========\n'+
-    SHOP_NAME+'\n'+
-    'Кассир: '+shift.cashier+'\n'+
-    'Открыта: '+fmtTime(shift.openedAt)+'\n'+
-    '----------------------------\n'+
-    'Чеков: '+shift.receipts.length+'\n'+
-    'Выручка: '+tot.toFixed(2)+' ₽\n'+
-    '  наличные: '+shift.cashTotal.toFixed(2)+' ₽\n'+
-    '  карта: '+shift.cardTotal.toFixed(2)+' ₽\n'+
-    'Скидок: '+disc.toFixed(2)+' ₽\n'+
-    'Внесено: '+shift.cashIn.toFixed(2)+' ₽ | Изъято: '+shift.cashOut.toFixed(2)+' ₽\n'+
-    'В ящике сейчас: '+drawerCash.toFixed(2)+' ₽\n'+
-    '============================';
-  alert(msg);
-}
-
-// ===== ВНЕСЕНИЕ / ИЗЪЯТИЕ =====
-function cashInModal(){
-  openModal(
-    '<h3>💰 Внесение в ящик</h3>'+
-    '<input type="number" id="ciAmt" step="0.01" min="0" placeholder="Сумма внесения">'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="closeModal()">Отмена</button>'+
-      '<button type="button" class="btn btn-ok" onclick="cashInApply()">Внести</button>'+
-    '</div>'
-  );
-  document.getElementById('ciAmt').focus();
-}
-function cashInApply(){
-  var v=parseFloat(document.getElementById('ciAmt').value);
-  if(isNaN(v)||v<=0){ alert('Некорректная сумма'); return; }
-  if(shift) shift.cashIn += v;
-  drawerCash += v;
-  saveState(); closeModal(); updateAdminInfo();
-}
-function cashOutModal(){
-  openModal(
-    '<h3>🏧 Изъятие из ящика</h3>'+
-    '<p class="muted">В ящике: '+drawerCash.toFixed(2)+' ₽</p>'+
-    '<input type="number" id="coAmt" step="0.01" min="0" max="'+drawerCash.toFixed(2)+'" placeholder="Сумма изъятия">'+
-    '<div class="payrow">'+
-      '<button type="button" class="btn btn-g" onclick="closeModal()">Отмена</button>'+
-      '<button type="button" class="btn btn-ok" onclick="cashOutApply()">Изъять</button>'+
-    '</div>'
-  );
-  document.getElementById('coAmt').focus();
-}
-function cashOutApply(){
-  var v=parseFloat(document.getElementById('coAmt').value);
-  if(isNaN(v)||v<=0||v>drawerCash){ alert('Сумма от 0 до остатка в ящике'); return; }
-  if(shift) shift.cashOut += v;
-  drawerCash -= v;
-  saveState(); closeModal(); updateAdminInfo();
-}
-
-// ===== АДМИН: КАТАЛОГ =====
-function renderAdminProducts(){
-  var body=document.getElementById('admProdBody');
-  body.innerHTML='';
-  document.getElementById('admCount').innerText = PRODUCTS.length+' шт.';
-  for(var i=0;i<PRODUCTS.length;i++){
-    (function(idx){
-      var p=PRODUCTS[idx];
-      var r=body.insertRow(-1);
-      r.insertCell(0).innerText=p.code;
-      var td1=r.insertCell(1);
-      var iN=document.createElement('input'); iN.value=p.name; iN.style.minHeight='28px'; iN.style.padding='3px 6px';
-      iN.onchange=function(){ p.name=iN.value; saveProducts(); };
-      td1.appendChild(iN);
-      var td2=r.insertCell(2);
-      var iP=document.createElement('input'); iP.type='number'; iP.step='0.01'; iP.value=p.price;
-      iP.style.minHeight='28px'; iP.style.padding='3px 6px';
-      iP.onchange=function(){ p.price=parseFloat(iP.value)||0; saveProducts(); };
-      td2.appendChild(iP);
-      var td3=r.insertCell(3);
-      var sT=document.createElement('select'); sT.style.minHeight='28px';
-      var o1=document.createElement('option'); o1.value='pcs'; o1.text='шт'; if(p.type==='pcs') o1.selected=true;
-      var o2=document.createElement('option'); o2.value='kg'; o2.text='кг'; if(p.type==='kg') o2.selected=true;
-      sT.add(o1); sT.add(o2);
-      sT.onchange=function(){ p.type=sT.value; saveProducts(); };
-      td3.appendChild(sT);
-      var td4=r.insertCell(4);
-      var bD=document.createElement('button'); bD.innerText='✕';
-      bD.onclick=function(){ PRODUCTS.splice(idx,1); saveProducts(); renderAdminProducts(); };
-      td4.appendChild(bD);
-    })(i);
-  }
-}
-function admAdd(){
-  var c=document.getElementById('aCode').value.trim();
-  var n=document.getElementById('aName').value.trim();
-  var pr=parseFloat(document.getElementById('aPrice').value);
-  var t=document.getElementById('aType').value;
-  if(!c||!n||isNaN(pr)||pr<=0){ alert('Заполните код, название и цену'); return; }
-  for(var i=0;i<PRODUCTS.length;i++){ if(PRODUCTS[i].code===c){ alert('Такой код уже есть'); return; } }
-  PRODUCTS.push({code:c, name:n, price:pr, type:t});
-  saveProducts(); renderAdminProducts();
-  document.getElementById('aCode').value='';
-  document.getElementById('aName').value='';
-  document.getElementById('aPrice').value='';
-}
-
-// ===== ЖУРНАЛ =====
-function renderLog(){
-  var body=document.getElementById('logBody');
-  body.innerHTML='';
-  if(shift.receipts.length===0){ body.innerHTML='<tr><td colspan="5" class="muted">Чеков пока нет</td></tr>'; return; }
-  for(var i=shift.receipts.length-1;i>=0;i--){
-    var r=shift.receipts[i];
-    var row=body.insertRow(-1);
-    row.insertCell(0).innerText=r.num;
-    row.insertCell(1).innerText=fmtTime(r.time);
-    row.insertCell(2).innerText=r.total.toFixed(2)+' ₽';
-    row.insertCell(3).innerText=r.method;
-    row.insertCell(4).innerText=r.discount>0? '−'+r.discount.toFixed(2)+' ₽' : '—';
-  }
-}
-
-// ===== СПРАВКА =====
-function helpModal(){
-  openModal(
-    '<h3>F1 — Горячие клавиши</h3>'+
-    '<table>'+
-      '<tr><td><b>Enter</b></td><td>Добавить товар по штрихкоду/названию</td></tr>'+
-      '<tr><td><b>F1</b></td><td>Справка</td></tr>'+
-      '<tr><td><b>F2</b></td><td>Фокус на поиск товара</td></tr>'+
-      '<tr><td><b>F3</b></td><td>Оплата наличными</td></tr>'+
-      '<tr><td><b>Ctrl+Enter</b></td><td>Оплата картой</td></tr>'+
-      '<tr><td><b>F4</b></td><td>Количество / вес выделенной строки</td></tr>'+
-      '<tr><td><b>F5</b></td><td>Скидка на чек, %</td></tr>'+
-      '<tr><td><b>F6</b></td><td>Удалить выделенную строку</td></tr>'+
-      '<tr><td><b>F7</b></td><td>Карта клиента (скидка '+CARD_DISCOUNT+'%)</td></tr>'+
-      '<tr><td><b>F8</b></td><td>Возврат последнего чека</td></tr>'+
-      '<tr><td><b>F9</b></td><td>Закрыть смену (Z-отчёт)</td></tr>'+
-      '<tr><td><b>F10</b></td><td>X-отчёт (без закрытия смены)</td></tr>'+
-      '<tr><td><b>↑ / ↓</b></td><td>Выбор строки чека</td></tr>'+
-      '<tr><td><b>Esc</b></td><td>Закрыть окно / очистить чек</td></tr>'+
-    '</table>'+
-    '<div class="payrow"><button type="button" class="btn btn-ok" onclick="closeModal()">Понятно</button></div>'
-  );
-}
-
-// ===== КЛАВИШИ =====
-document.addEventListener('keydown', function(e){
-  if(document.getElementById('adminPanel').style.display==='block') return;
-  if(document.getElementById('loginBox').style.display==='block') return;
-
-  var appVisible = document.getElementById('app').style.display==='block';
-  var modalOpen = document.getElementById('modalBg').style.display==='flex';
-
-  if(modalOpen){
-    if(e.key==='Escape'){ e.preventDefault(); closeModal(); }
-    return;
-  }
-
-  if(!appVisible) return;
-
-  switch(e.key){
-    case 'F1': e.preventDefault(); helpModal(); break;
-    case 'F2': e.preventDefault(); focusSearch(); break;
-    case 'F3': e.preventDefault(); pay('Наличные'); break;
-    case 'F4': e.preventDefault(); qtyModal(); break;
-    case 'F5': e.preventDefault(); discountModal(); break;
-    case 'F6': e.preventDefault(); delLine(); break;
-    case 'F7': e.preventDefault(); cardModal(); break;
-    case 'F8': e.preventDefault(); voidLast(); break;
-    case 'F9': e.preventDefault(); closeShift(); break;
-    case 'F10': e.preventDefault(); xReport(); break;
-    case 'Escape': e.preventDefault(); clearCart(); break;
-    case 'ArrowDown': if(cart.length){ selectedLine=Math.min(cart.length-1, selectedLine+1); renderCart(); } e.preventDefault(); break;
-    case 'ArrowUp': if(cart.length){ selectedLine=Math.max(0, selectedLine-1); renderCart(); } e.preventDefault(); break;
-    case 'Enter':
-      if(e.ctrlKey){ e.preventDefault(); pay('Карта'); break; }
-      if(document.activeElement===document.getElementById('search')){
-        e.preventDefault();
-        var q=document.getElementById('search').value;
-        var p=findProduct(q);
-        if(p){
-          addToCart(p, 1);
-          document.getElementById('search').value='';
-          renderProducts();
-        } else alert('Товар не найден');
+    const peer = new Peer(id);
+    peer.on('open', () => setState(num, 'free', 'свободна'));
+    peer.on('error', e => {
+      if (e.type === 'unavailable-id') setState(num, 'free', 'номер занят — смените код');
+      else setState(num, 'free', 'ошибка: ' + e.type);
+    });
+    peer.on('call', call => {
+      if (lines[num].call) { // линия занята
+        call.close(); addLog(num, 'пропущенный вызов (линия занята)'); return;
       }
-      break;
-  }
-});
-
-// ===== СЛУЖЕБНОЕ =====
-function fmtTime(iso){
-  var d=new Date(iso);
-  var hh=('0'+d.getHours()).slice(-2), mm=('0'+d.getMinutes()).slice(-2);
-  return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+hh+':'+mm;
+      lines[num].call = call;
+      addLog(num, 'входящий вызов');
+      if (document.getElementById('autoAnswer').checked) answerHold(num);
+      else {
+        setState(num, 'ring', 'ВХОДЯЩИЙ ВЫЗОВ');
+        startIncomingRing();
+        showCtrl(num,
+          '<button class="btn-green" onclick="answerMic(\'' + num + '\')">Ответить</button>' +
+          '<button class="btn-grey" onclick="rejectCall(\'' + num + '\')">Отклонить</button>');
+      }
+    });
+    lines[num].peer = peer;
+  });
+  document.getElementById('opStatus').textContent = 'Диспетчерская открыта. Страницу держите открытой.';
 }
 
-setInterval(function(){
-  var el=document.getElementById('clock');
-  if(el) el.innerText = new Date().toLocaleTimeString('ru-RU');
-}, 1000);
+function setState(num, cls, text) {
+  const el = document.getElementById('state-' + num);
+  if (!el) return;
+  el.className = 'line-state ' + (cls === 'free' ? '' : cls);
+  el.textContent = text;
+}
+function showCtrl(num, html) { document.getElementById('ctrl-' + num).innerHTML = html; }
 
-loadState();
+async function getMic() {
+  if (micStream) return micStream;
+  micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  return micStream;
+}
+function applyMute() {
+  if (micStream) micStream.getAudioTracks().forEach(t => t.enabled = !muted);
+}
+
+async function answerMic(num) {
+  stopSound(); showCtrl(num, '');
+  try {
+    const stream = await getMic();
+    lines[num].call.answer(stream);
+    setState(num, 'active', 'СОЕДИНЕНИЕ УСТАНОВЛЕНО');
+    addLog(num, 'принят (микрофон)');
+    lines[num].call.on('close', () => closeLine(num, 'вызов завершён'));
+  } catch (e) { setState(num, 'free', 'нет доступа к микрофону'); }
+}
+
+function answerHold(num) {
+  stopSound();
+  const call = lines[num].call;
+  call.answer(makeHoldStream().getAudioTracks()[0]);
+  setState(num, 'ring', 'НА УДЕРЖАНИИ (музыка)');
+  addLog(num, 'поставлен на удержание');
+  showCtrl(num,
+    '<button class="btn-green" onclick="acceptHold(\'' + num + '\')">Принять вызов</button>' +
+    '<button class="btn-grey" onclick="rejectCall(\'' + num + '\')">Завершить</button>');
+  call.on('close', () => closeLine(num, 'вызов завершён'));
+}
+
+async function acceptHold(num) {
+  try {
+    const stream = await getMic();
+    applyMute();
+    const sender = lines[num].call.peerConnection.getSenders()
+      .find(s => s.track && s.track.kind === 'audio');
+    if (sender) await sender.replaceTrack(stream.getAudioTracks()[0]);
+    setState(num, 'active', 'СОЕДИНЕНИЕ УСТАНОВЛЕНО');
+    addLog(num, 'принят с удержания');
+    showCtrl(num, '<button class="btn-grey" onclick="rejectCall(\'' + num + '\')">Завершить вызов</button>');
+  } catch (e) { setState(num, 'free', 'нет доступа к микрофону'); }
+}
+
+function rejectCall(num) {
+  stopSound();
+  if (lines[num].call) lines[num].call.close();
+  addLog(num, 'отклонён оператором');
+  closeLine(num, 'свободна');
+}
+function closeLine(num, text) {
+  stopSound();
+  lines[num].call = null;
+  setState(num, 'free', text);
+  showCtrl(num, '');
+}
+function addLog(num, text) {
+  const t = new Date().toLocaleTimeString('ru-RU');
+  const div = document.createElement('div');
+  div.textContent = t + ' — ' + SERVICE_NAMES[num] + ': ' + text;
+  document.getElementById('log').prepend(div);
+}
+
+/* ---------- ВЫЗЫВАЮЩИЙ ---------- */
+function showCaller() {
+  document.getElementById('roleSelect').classList.add('hidden');
+  document.getElementById('caller').classList.remove('hidden');
+}
+let callerCall = null;
+async function makeCall(num) {
+  const code = safeId(document.getElementById('callCode').value);
+  const st = document.getElementById('callStatus');
+  if (!code) { st.textContent = 'Введите код диспетчерской'; return; }
+  if (callerCall) callerCall.close();
+  try {
+    const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mic.getAudioTracks()[0].enabled = !muted;
+    const peer = new Peer();
+    peer.on('open', () => {
+      st.textContent = 'Вызов ' + SERVICE_NAMES[num] + '…';
+      startRingback();
+      callerCall = peer.call(num + '-' + code, mic);
+      callerCall.on('stream', remote => {
+        stopSound();
+        st.textContent = SERVICE_NAMES[num] + ': на линии. Оставайтесь на связи.';
+        st.classList.add('active');
+        document.getElementById('btnEndCall').classList.remove('hidden');
+        const a = document.createElement('audio');
+        a.srcObject = remote; a.autoplay = true;
+        document.body.appendChild(a);
+        callerCall._audio = a;
+      });
+      callerCall.on('close', () => {
+        stopSound();
+        st.textContent = 'Диспетчер завершил вызов';
+        st.classList.remove('active');
+        document.getElementById('btnEndCall').classList.add('hidden');
+        if (callerCall && callerCall._audio) callerCall._audio.remove();
+        callerCall = null;
+      });
+    });
+  } catch (e) { st.textContent = 'Нет доступа к микрофону'; }
+}
+function endCall() {
+  stopSound();
+  if (callerCall) callerCall.close();
+  document.getElementById('callStatus').textContent = 'Вызов завершён';
+  document.getElementById('btnEndCall').classList.add('hidden');
+}
 </script>
 </body>
 </html>
